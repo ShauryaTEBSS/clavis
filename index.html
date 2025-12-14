@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clavis | Universal Academic Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="splash-screen">
+        <img src="https://cdn.shaurya.dpdns.org/clavis.jpg" alt="Clavis Logo" class="splash-logo">
+        <h1>CLAVIS</h1>
+    </div>
+
+    <div id="main-container" class="hidden">
+        
+        <header class="university-header">
+            <div class="logo-area">
+                <img src="https://cdn.shaurya.dpdns.org/clavis.jpg" alt="Logo">
+            </div>
+            <div class="banner-area">
+                <img src="https://cdn.shaurya.dpdns.org/clavis-b.jpg" alt="University Banner">
+                <div class="banner-text">
+                    <h2>Academic Participation Portal</h2>
+                </div>
+            </div>
+        </header>
+
+        <section id="login-view" class="active-view">
+            <div class="auth-box">
+                <h3><i class="fas fa-university"></i> Student/Faculty Login</h3>
+                <form id="login-form">
+                    <div class="input-group">
+                        <label>Username</label>
+                        <input type="text" id="login-username" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Login to Portal</button>
+                    <p class="register-link">Not registered? <a href="#" onclick="showRegister()">Register Now</a></p>
+                </form>
+            </div>
+            
+            <div class="announcements-ticker">
+                <h4><i class="fas fa-bullhorn"></i> Latest Announcements</h4>
+                <ul>
+                    <li>Registrations open for International Science Seminar 2025.</li>
+                    <li>Call for Papers: Journal of Modern Physics due Oct 15.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="register-view" class="hidden">
+            <div class="auth-box wide-box">
+                <h3>New User Registration</h3>
+                
+                <div class="steps-indicator">
+                    <span class="step active" id="ind-1">1. Personal</span>
+                    <span class="step" id="ind-2">2. Organization</span>
+                    <span class="step" id="ind-3">3. Verification</span>
+                    <span class="step" id="ind-4">4. Account</span>
+                </div>
+
+                <form id="reg-form">
+                    <div class="form-step" id="step-1">
+                        <h4>Personal Information</h4>
+                        <input type="text" id="reg-name" placeholder="Full Name" required>
+                        <input type="text" id="reg-phone" placeholder="Contact Number" required>
+                        <textarea id="reg-address" placeholder="Address Details"></textarea>
+                        
+                        <div class="otp-group">
+                            <input type="email" id="reg-email" placeholder="Email Address" required>
+                            <button type="button" id="btn-send-otp" onclick="sendOTP()">Send OTP</button>
+                        </div>
+                        <div id="otp-verify-section" class="hidden">
+                            <input type="text" id="reg-otp-input" placeholder="Enter OTP from Email">
+                            <small id="otp-status"></small>
+                        </div>
+
+                        <div class="btn-row">
+                            <button type="button" class="btn-secondary" onclick="showLogin()">Cancel</button>
+                            <button type="button" class="btn-primary" onclick="nextStep(2)">Next</button>
+                        </div>
+                    </div>
+
+                    <div class="form-step hidden" id="step-2">
+                        <h4>Organizational Details</h4>
+                        <label>Agency</label>
+                        <select id="reg-agency" disabled>
+                            <option selected>Clavis Edu</option>
+                        </select>
+                        <input type="text" id="reg-profession" placeholder="Profession (e.g., Professor, Student)" required>
+                        <input type="text" id="reg-org-name" placeholder="Organization Name" required>
+                        
+                        <div class="btn-row">
+                            <button type="button" class="btn-secondary" onclick="prevStep(1)">Back</button>
+                            <button type="button" class="btn-primary" onclick="nextStep(3)">Next</button>
+                        </div>
+                    </div>
+
+                    <div class="form-step hidden" id="step-3">
+                        <h4>ID Verification</h4>
+                        <select id="reg-country" onchange="toggleIDOptions()">
+                            <option value="">Select Country</option>
+                            <option value="India">India</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        
+                        <div id="id-type-wrapper">
+                            <label>ID Type</label>
+                            <select id="reg-id-type">
+                                <option value="passport">Passport</option>
+                                <option value="national_id">National ID</option>
+                            </select>
+                        </div>
+
+                        <input type="text" id="reg-id-no" placeholder="Identifier Number" required>
+                        
+                        <label>Upload ID (JPG, < 100kb)</label>
+                        <input type="file" id="reg-id-file" accept="image/jpeg" required>
+
+                        <div class="btn-row">
+                            <button type="button" class="btn-secondary" onclick="prevStep(2)">Back</button>
+                            <button type="button" class="btn-primary" onclick="nextStep(4)">Next</button>
+                        </div>
+                    </div>
+
+                    <div class="form-step hidden" id="step-4">
+                        <h4>Account Security</h4>
+                        <input type="text" id="reg-username" placeholder="Create Username" required>
+                        <input type="password" id="reg-password" placeholder="Create Password" onkeyup="checkPass()" required>
+                        <small id="pass-strength"></small>
+                        
+                        <input type="text" id="reg-misc" placeholder="Miscellaneous Info (Optional)">
+
+                        <div class="btn-row">
+                            <button type="button" class="btn-secondary" onclick="prevStep(3)">Back</button>
+                            <button type="button" class="btn-primary" onclick="submitRegistration()">Submit Registration</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <section id="portal-view" class="hidden">
+            <h1>Welcome to User Portal</h1>
+        </section>
+
+    </div>
+
+    <div id="loader" class="hidden">Processing...</div>
+
+    <script src="script.js"></script>
+</body>
+</html>
