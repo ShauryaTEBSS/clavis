@@ -165,7 +165,7 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
             document.getElementById('login-view').classList.add('hidden');
             document.getElementById('portal-view').classList.remove('hidden');
         } else {
-            alert("Login Failed: " + data.message);
+            alert("Login Failed: " + (data.message || data.error));
         }
     });
 });
