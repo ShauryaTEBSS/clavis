@@ -14,7 +14,121 @@
         <h1>CLAVIS</h1>
     </div>
 
-    <div id="main-container" class="hidden">
+    <section id="portal-view" class="hidden">
+    
+    <div class="portal-header">
+        <div class="burger-menu" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="portal-logo">
+            <img src="https://cdn.shaurya.dpdns.org/clavis.jpg" alt="Logo">
+            <span>CLAVIS USER PORTAL</span>
+        </div>
+        <div class="user-badge" id="display-username">Student</div>
+    </div>
+
+    <div id="sidebar" class="sidebar">
+        <a href="#" onclick="loadPortalPage('announcements')"><i class="fas fa-bullhorn"></i> Announcements</a>
+        <a href="#" onclick="loadPortalPage('registration')"><i class="fas fa-calendar-check"></i> Registration (Webinars)</a>
+        <a href="#" onclick="loadPortalPage('webinars')"><i class="fas fa-video"></i> My Webinars</a>
+        <a href="#" onclick="loadPortalPage('submission')"><i class="fas fa-file-upload"></i> Submission Portal</a>
+        <a href="#" onclick="loadPortalPage('payment')"><i class="fas fa-credit-card"></i> Payment Portal</a>
+        <a href="#" onclick="loadPortalPage('profile')"><i class="fas fa-user-edit"></i> Edit Profile</a>
+        <a href="#" onclick="location.reload()" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <div class="portal-content" id="portal-content">
+        
+        <div id="page-announcements" class="portal-page">
+            <h2><i class="fas fa-bullhorn"></i> General Announcements</h2>
+            <div id="announcement-list">
+                <p>Loading updates...</p>
+            </div>
+        </div>
+
+        <div id="page-registration" class="portal-page hidden">
+            <h2>Upcoming Webinars & Seminars</h2>
+            <div class="webinar-card">
+                <h3>International AI Summit 2025</h3>
+                <p>Date: 20th Oct 2025 | Fee: $50</p>
+                <button class="btn-primary" onclick="openWebinarForm('AI Summit 2025', true)">Register Now</button>
+            </div>
+            <div class="webinar-card">
+                <h3>Literature in Modern Era</h3>
+                <p>Date: 25th Oct 2025 | Fee: Free</p>
+                <button class="btn-primary" onclick="openWebinarForm('Literature Mod Era', false)">Register Now</button>
+            </div>
+            
+            <div id="webinar-modal" class="modal hidden">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h3 id="modal-title">Register</h3>
+                    <form id="web-reg-form">
+                        <input type="text" id="web-name" placeholder="Full Name" required>
+                        <input type="text" id="web-email" placeholder="Email" required>
+                        <div id="payment-field" class="hidden">
+                            <p style="color:red; font-size:0.9em;">* This event requires payment. Please go to Payment Portal after submitting to confirm.</p>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="submitWebinar()">Confirm Registration</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-submission" class="portal-page hidden">
+            <h2>Submission Portal</h2>
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="showSubTab('paper')">Research Paper</button>
+                <button class="tab-btn" onclick="showSubTab('misc')">Miscellaneous</button>
+            </div>
+
+            <div id="sub-paper" class="sub-tab-content">
+                <div class="info-box">
+                    <strong>Instructions:</strong>
+                    <ul>
+                        <li>Max words: 6000</li>
+                        <li>Format: Chicago Style</li>
+                        <li>File Type: .doc / .docx (Max 4MB)</li>
+                    </ul>
+                </div>
+                <label>Select Journal/Edition</label>
+                <select id="paper-journal">
+                    <option>Clavis Journal of Science (Vol 4)</option>
+                    <option>Clavis Humanities Review (Vol 2)</option>
+                </select>
+                <input type="text" id="paper-title" placeholder="Title of Research Paper">
+                <input type="text" id="paper-authors" placeholder="Authors (Name & Designation)">
+                <input type="file" id="paper-file" accept=".doc,.docx">
+                <button class="btn-primary" onclick="submitResearchPaper()">Upload Paper</button>
+            </div>
+
+            <div id="sub-misc" class="sub-tab-content hidden">
+                <h3>Miscellaneous Uploads</h3>
+                <p>Additional documents requested by admin.</p>
+                <input type="text" placeholder="Document Description">
+                <input type="file">
+                <button class="btn-primary">Submit</button>
+            </div>
+        </div>
+
+        <div id="page-payment" class="portal-page hidden">
+            <h2>Payment Portal</h2>
+            <p>If you registered for a paid webinar, enter details here to confirm slot.</p>
+            <input type="text" placeholder="Webinar Name">
+            <input type="text" placeholder="Transaction ID / Reference No">
+            <input type="file" accept="image/*" placeholder="Upload Screenshot">
+            <button class="btn-primary">Submit Payment Proof</button>
+        </div>
+
+        <div id="page-profile" class="portal-page hidden">
+            <h2>Edit Profile</h2>
+            <input type="text" placeholder="Update Name">
+            <input type="text" placeholder="Update Organization">
+            <button class="btn-primary">Save Changes</button>
+        </div>
+
+    </div>
+</section>
         
         <header class="university-header">
             <div class="logo-area">
