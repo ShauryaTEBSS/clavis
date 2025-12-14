@@ -1,5 +1,5 @@
 // REPLACE WITH YOUR GOOGLE SCRIPT WEB APP URL
-const API_URL = "https://script.google.com/a/~/macros/s/AKfycbxvzB0OB7kjp5NcJGU5C2vfSIjvscmvQgkIrZYOrA5KzzaE5lBF0uNnrHAIJtKa8NM/exec";
+const API_URL = "https://script.google.com/a/~/macros/s/AKfycbxW1ZcimvY0OI1N4CSkDvYTKleIiJsgGmU2NAbLoL4bD9wA6F0jAXzWk1Nno_eSNxXZ/exec";
 
 let serverOTP = ""; // In production, don't store OTP in JS var. This is for demo logic.
 
