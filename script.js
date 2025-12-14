@@ -169,3 +169,138 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
         }
     });
 });
+
+/* --- PORTAL LOGIC --- */
+
+// 1. Sidebar Toggle
+function toggleSidebar() {
+    const sb = document.getElementById("sidebar");
+    const content = document.getElementById("portal-content");
+    if(sb.style.width === "250px") {
+        sb.style.width = "0";
+        content.style.marginLeft = "0";
+    } else {
+        sb.style.width = "250px";
+        content.style.marginLeft = "250px"; // Push content
+    }
+}
+
+// 2. Page Navigation
+function loadPortalPage(pageName) {
+    // Hide all pages
+    document.querySelectorAll('.portal-page').forEach(p => p.classList.add('hidden'));
+    // Show selected
+    document.getElementById(`page-${pageName}`).classList.remove('hidden');
+    // Close sidebar on mobile select
+    document.getElementById("sidebar").style.width = "0";
+    document.getElementById("portal-content").style.marginLeft = "0";
+
+    if(pageName === 'announcements') fetchAnnouncements();
+}
+
+// 3. Announcements Fetcher
+function fetchAnnouncements() {
+    const list = document.getElementById('announcement-list');
+    list.innerHTML = "<p>Loading...</p>";
+    
+    fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: "get_announcements" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.result === "success") {
+            list.innerHTML = "";
+            data.data.forEach(ann => {
+                const item = document.createElement('div');
+                item.className = "webinar-card"; // Reuse card style
+                item.innerHTML = `<h4>${ann.title}</h4><p>${ann.content}</p><small>${new Date(ann.date).toDateString()}</small>`;
+                list.appendChild(item);
+            });
+        }
+    });
+}
+
+// 4. Webinar Registration Logic
+let currentWebinar = "";
+let isPaidEvent = false;
+
+function openWebinarForm(name, paid) {
+    currentWebinar = name;
+    isPaidEvent = paid;
+    document.getElementById('webinar-modal').classList.remove('hidden');
+    document.getElementById('modal-title').innerText = "Register: " + name;
+    
+    if(paid) document.getElementById('payment-field').classList.remove('hidden');
+    else document.getElementById('payment-field').classList.add('hidden');
+}
+
+function closeModal() {
+    document.getElementById('webinar-modal').classList.add('hidden');
+}
+
+function submitWebinar() {
+    // Basic User info
+    // NOTE: In a real app, you'd pull this from the logged-in session automatically
+    const username = document.getElementById('login-username').value; 
+    
+    const payload = {
+        action: "register_webinar",
+        username: username,
+        webinarName: currentWebinar,
+        status: isPaidEvent ? "Draft (Payment Pending)" : "Confirmed"
+    };
+
+    document.getElementById('loader').classList.remove('hidden');
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('loader').classList.add('hidden');
+        closeModal();
+        if(isPaidEvent) {
+            alert("Registration Drafted! Please go to Payment Portal to complete.");
+            loadPortalPage('payment');
+        } else {
+            alert("Registration Confirmed!");
+        }
+    });
+}
+
+// 5. Research Paper Submission Logic
+function showSubTab(tab) {
+    document.querySelectorAll('.sub-tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById(`sub-${tab}`).classList.remove('hidden');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function submitResearchPaper() {
+    const fileInput = document.getElementById('paper-file');
+    if(fileInput.files.length === 0) { alert("Please select a file"); return; }
+    
+    const file = fileInput.files[0];
+    // Size Check: 4MB = 4 * 1024 * 1024
+    if(file.size > 4194304) { alert("File too large. Max 4MB."); return; }
+    
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function() {
+        const payload = {
+            action: "submit_paper",
+            username: document.getElementById('login-username').value,
+            title: document.getElementById('paper-title').value,
+            authors: document.getElementById('paper-authors').value,
+            journal: document.getElementById('paper-journal').value,
+            fileName: file.name,
+            fileData: reader.result
+        };
+
+        document.getElementById('loader').classList.remove('hidden');
+        fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('loader').classList.add('hidden');
+            alert("Research Paper Submitted Successfully!");
+        });
+    };
+}
