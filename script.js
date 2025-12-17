@@ -168,7 +168,23 @@ document.getElementById('login-form').addEventListener('submit', function(e) {
             alert("Login Failed: " + (data.message || data.error));
         }
     });
+    // ... inside your login fetch success block ...
+if(data.result === "success") {
+    // Check Role
+    if(data.user.role === "admin") {
+        alert("Welcome Administrator!");
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('admin-view').classList.remove('hidden');
+        loadAdminData(); // Load admin tables
+    } else {
+        alert("Login Successful! Welcome " + data.user.name);
+        document.getElementById('login-view').classList.add('hidden');
+        document.getElementById('portal-view').classList.remove('hidden');
+        loadPortalPage('announcements'); // Load announcements immediately
+    }
+}
 });
+
 
 /* --- PORTAL LOGIC --- */
 
@@ -303,4 +319,103 @@ function submitResearchPaper() {
             alert("Research Paper Submitted Successfully!");
         });
     };
+}
+
+// WEBINAR FLOW LOGIC
+let currentWebinarName = "";
+let isWebinarPaid = false;
+
+function openWebinarForm(name, paid) {
+    currentWebinarName = name;
+    isWebinarPaid = paid;
+    
+    // Reset Modal
+    document.getElementById('webinar-modal').classList.remove('hidden');
+    document.getElementById('modal-step-1').classList.remove('hidden');
+    document.getElementById('modal-step-2').classList.add('hidden');
+    document.getElementById('modal-title').innerText = "Register: " + name;
+    
+    // Show/Hide Payment Warning
+    if(paid) document.getElementById('payment-notice').classList.remove('hidden');
+    else document.getElementById('payment-notice').classList.add('hidden');
+}
+
+function proceedWebinarFlow() {
+    if(isWebinarPaid) {
+        // Go to QR Screen
+        document.getElementById('modal-step-1').classList.add('hidden');
+        document.getElementById('modal-step-2').classList.remove('hidden');
+    } else {
+        // Just Submit (Free)
+        submitPaidWebinar(false);
+    }
+}
+
+function backToStep1() {
+    document.getElementById('modal-step-2').classList.add('hidden');
+    document.getElementById('modal-step-1').classList.remove('hidden');
+}
+
+function submitPaidWebinar(hasFile = true) {
+    const username = document.getElementById('login-username').value; // Get logged in user
+    
+    let payload = {
+        action: "register_webinar",
+        username: username,
+        webinarName: currentWebinarName,
+        status: isWebinarPaid ? "Paid (Pending Verification)" : "Confirmed (Free)"
+    };
+
+    // If Paid, handle file upload
+    if(hasFile && isWebinarPaid) {
+        const fileInput = document.getElementById('web-payment-proof');
+        if(fileInput.files.length === 0) { alert("Please upload payment screenshot"); return; }
+        
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function() {
+            payload.fileName = file.name;
+            payload.fileData = reader.result;
+            sendWebinarData(payload);
+        };
+    } else {
+        sendWebinarData(payload);
+    }
+}
+
+function sendWebinarData(payload) {
+    document.getElementById('loader').classList.remove('hidden');
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('loader').classList.add('hidden');
+        closeModal();
+        alert(data.result === "success" ? "Registration Successful!" : "Error: " + data.error);
+    });
+}
+function loadAdminData() {
+    fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: "admin_get_data" })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.result === "success") {
+            // Render Users
+            let uHtml = "<table class='clavis-table'><thead><tr><th>Name</th><th>Email</th><th>Org</th></tr></thead><tbody>";
+            data.users.forEach(u => uHtml += `<tr><td>${u[4]}</td><td>${u[3]}</td><td>${u[7]}</td></tr>`); // Indices based on sheet columns
+            uHtml += "</tbody></table>";
+            document.getElementById('admin-users-list').innerHTML = uHtml;
+
+            // Render Webinars
+            let wHtml = "<table class='clavis-table'><thead><tr><th>User</th><th>Event</th><th>Proof</th></tr></thead><tbody>";
+            data.webinars.forEach(w => {
+                let proofLink = w[4] && w[4].startsWith('http') ? `<a href="${w[4]}" target="_blank">View Proof</a>` : "N/A";
+                wHtml += `<tr><td>${w[1]}</td><td>${w[2]}</td><td>${proofLink}</td></tr>`;
+            });
+            wHtml += "</tbody></table>";
+            document.getElementById('admin-webinars-list').innerHTML = wHtml;
+        }
+    });
 }
